@@ -1,0 +1,82 @@
+<ion-content fullscreen="true">
+  <div class="cropper-container" [ngClass]="{'open': imageSelectedIndex !== -1}">
+    <div *ngIf="!cropperActive" class="main-header">
+      <ion-button (click)="cropperActive = true" fill="clear" color="light">
+        <ion-icon slot="icon-only" name="create"></ion-icon>
+      </ion-button>
+
+      <ion-button fill="clear" (click)="imageSelectedIndex = -1" color="light">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </div>
+
+    <img *ngIf="!cropperActive && images && images[imageSelectedIndex] && images[imageSelectedIndex].active" [src]="images[imageSelectedIndex].active">
+
+    <div *ngIf="cropperActive" class="image-cropper-container">
+      <image-cropper
+        #imageCropper
+        *ngIf="images && images[imageSelectedIndex] && images[imageSelectedIndex].active"
+        [imageBase64]="images[imageSelectedIndex].active"
+        [maintainAspectRatio]="true"
+        [aspectRatio]="210 / 297"
+        [format]="'jpeg'"
+        [disabled]="disableCropper"
+        [transform]="transform"
+        [backgroundColor]="'#FFFFFF'"
+        (imageCropped)="imageCropped($event)"
+      ></image-cropper>
+
+      <div class="actions-for-edit">
+        <ion-button (click)="cancel()" fill="clear" color="danger">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+
+        <ion-button (click)="rotation = rotation - 90; updateRotation()" fill="clear" color="dark">
+          <ion-icon slot="icon-only" name="undo"></ion-icon>
+        </ion-button>
+  
+        <ion-button (click)="rotation = rotation + 90; updateRotation()" fill="clear" color="dark">
+          <ion-icon slot="icon-only" name="redo"></ion-icon>
+        </ion-button>
+  
+        <ion-button fill="clear" (click)="restoreOriginal()" color="dark">
+          <ion-icon slot="icon-only" name="refresh"></ion-icon>
+        </ion-button>
+
+        <ion-button (click)="save()" fill="clear" color="success">
+          <ion-icon slot="icon-only" name="save"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="actions-content" [ngClass]="{'hide-actions': cropperActive}">
+    <div class="pictures-content" [ngClass]="{'options-opened': imageSelectedIndex !== -1}">
+      <ion-slides *ngIf="images && images.length" #slides [options]="slideOpts">
+        <ion-slide *ngFor="let img of images; let i = index">
+          <div (click)="selectImage(i)" tappable class="picture" [ngClass]="{'selected': imageSelectedIndex === i}">
+            <img [src]="img.active">
+          </div>
+        </ion-slide>
+      </ion-slides>
+    </div>
+
+    <div *ngIf="imageSelectedIndex === -1" class="buttons-content">
+      <div tappable (click)="changeCamera()" class="alt-button" [ngClass]="{'disable-button': disableBtn}">
+        <div class="alt-inside">
+          <ion-icon name="reverse-camera"></ion-icon>
+        </div>
+      </div>
+
+      <div tappable (click)="takePicture()" class="main-button" [ngClass]="{'disable-button': disableBtn}">
+        <div class="main-inside"></div>
+      </div>
+
+      <div tappable (click)="generateDocument()" class="alt-button save" [ngClass]="{'disable-button': disableBtn}">
+        <div class="alt-inside">
+          <ion-icon name="checkmark"></ion-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>
